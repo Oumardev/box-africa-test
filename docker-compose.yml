@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # Service frontend (Next.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - API_URL=http://backend:3001
+        - NODE_ENV=production
+    ports:
+      - "3000:3000"
+    environment:
+      - API_URL=http://backend:3001
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - taskmaster-network
+
+  # Service backend (json-server)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend/db.json:/app/db.json
+    restart: unless-stopped
+    networks:
+      - taskmaster-network
+
+# Réseau partagé pour la communication entre services
+networks:
+  taskmaster-network:
+    driver: bridge

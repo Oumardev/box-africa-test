@@ -1,0 +1,17 @@
+{
+  "name": "taskmaster-pro",
+  "version": "1.0.0",
+  "description": "Application de gestion des tâches avec multi-thème",
+  "scripts": {
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:api": "cd backend && npx json-server --watch db.json --port 3001",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:api\"",
+    "test": "cd frontend && npm test",
+    "test:coverage": "cd frontend && npm test -- --coverage",
+    "test:watch": "cd frontend && npm test -- --watch"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "json-server": "^1.0.0-beta.3"
+  }
+}

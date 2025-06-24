@@ -1,0 +1,105 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Alice Dupont",
+      "role": "Développeur"
+    },
+    {
+      "id": "2",
+      "name": "Jean Martin",
+      "role": "Chef de projet"
+    },
+    {
+      "id": "3",
+      "name": "Sophie Bernard",
+      "role": "Designer UX/UI"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "1",
+      "title": "Mise en place de l'architecture frontend",
+      "description": "Définir et implémenter l'architecture modulaire du frontend avec Next.js en utilisant les principes de clean architecture",
+      "status": "completed",
+      "priority": "high",
+      "dueDate": "2025-06-10T00:00:00.000Z",
+      "assigneeId": 1,
+      "comments": [
+        {
+          "id": 1,
+          "content": "Architecture validée par l'équipe",
+          "userId": 2,
+          "createdAt": "2025-06-05T14:30:00.000Z"
+        }
+      ],
+      "attachments": [],
+      "tags": [
+        "frontend",
+        "architecture"
+      ]
+    },
+    {
+      "title": "Développer la gestion de thèmes UI",
+      "description": "Mettre en place un système permettant de basculer entre Material UI et ShadCN UI",
+      "status": "completed",
+      "priority": "high",
+      "assigneeId": "3",
+      "tags": [
+        "frontend",
+        "ui",
+        "theming"
+      ],
+      "dueDate": "2025-06-15T00:00:00.000Z",
+      "id": "2"
+    },
+    {
+      "id": "3",
+      "title": "Interface de gestion des tâches",
+      "description": "Créer les composants pour l'ajout, l'édition et la suppression des tâches",
+      "status": "in_progress",
+      "priority": "medium",
+      "dueDate": "2025-06-25T00:00:00.000Z",
+      "assigneeId": 1,
+      "comments": [
+        {
+          "id": 2,
+          "content": "Formulaires terminés, reste l'intégration avec l'API",
+          "userId": 1,
+          "createdAt": "2025-06-20T09:45:00.000Z"
+        }
+      ],
+      "attachments": [],
+      "tags": [
+        "frontend",
+        "forms"
+      ]
+    },
+    {
+      "title": "Backend fictif avec JSON Server",
+      "description": "Configurer une API fictive pour le développement frontend",
+      "status": "todo",
+      "priority": "high",
+      "assigneeId": "3",
+      "tags": [
+        "backend",
+        "api"
+      ],
+      "dueDate": "2025-06-27T00:00:00.000Z",
+      "id": "4"
+    },
+    {
+      "title": "Tests unitaires pour les composants UI",
+      "description": "Mettre en place des tests unitaires pour les composants UI principaux",
+      "status": "todo",
+      "priority": "medium",
+      "assigneeId": "1",
+      "tags": [
+        "testing",
+        "frontend"
+      ],
+      "dueDate": "2025-06-30T00:00:00.000Z",
+      "id": "5"
+    }
+  ]
+}

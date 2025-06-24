@@ -1,0 +1,114 @@
+name: TaskMaster Pro CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies (Frontend)
+        run: |
+          cd frontend
+          npm ci
+          
+      - name: Lint (Frontend)
+        run: |
+          cd frontend
+          npm run lint
+          
+      - name: Run tests (Frontend)
+        run: |
+          cd frontend
+          npm test -- --coverage
+          
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: frontend/coverage/
+      
+      # Optionally validate backend JSON if needed
+      - name: Validate backend JSON
+        run: |
+          cd backend
+          # Validates that db.json is a valid JSON file
+          npx jsonlint-mod db.json || (echo "Invalid JSON in db.json" && exit 1)
+
+  build-docker:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Build and push frontend image
+      - name: Build and push Frontend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/taskmaster-frontend:${{ github.sha }},ghcr.io/${{ github.repository_owner }}/taskmaster-frontend:latest
+          build-args: |
+            API_URL=http://backend:3001
+            NODE_ENV=production
+            
+      # Build and push backend image  
+      - name: Build and push Backend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/taskmaster-backend:${{ github.sha }},ghcr.io/${{ github.repository_owner }}/taskmaster-backend:latest
+            
+  deploy:
+    needs: build-docker
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      # Deploy using docker-compose (simulation)
+      - name: Deploy with docker-compose
+        run: |
+          echo "Déploiement simulé avec docker-compose"
+          echo "Frontend image: ghcr.io/${{ github.repository_owner }}/taskmaster-frontend:${{ github.sha }}"
+          echo "Backend image: ghcr.io/${{ github.repository_owner }}/taskmaster-backend:${{ github.sha }}"
+          
+          # Dans un environnement réel, vous pourriez utiliser docker-compose comme ceci :
+          # echo "FRONTEND_IMAGE=ghcr.io/${{ github.repository_owner }}/taskmaster-frontend:${{ github.sha }}" > .env
+          # echo "BACKEND_IMAGE=ghcr.io/${{ github.repository_owner }}/taskmaster-backend:${{ github.sha }}" >> .env
+          # echo "API_URL=http://backend:3001" >> .env
+          # echo "NODE_ENV=production" >> .env
+          # docker-compose -f docker-compose.prod.yml up -d
+          
+          echo "Variables d'environnement configurées pour le déploiement :"
+          echo "API_URL=http://backend:3001"
+          echo "NODE_ENV=production"

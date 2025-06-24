@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ main, master ]
 
+# Permissions nécessaires pour le GitHub Container Registry
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -52,6 +57,9 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request'
+    permissions:
+      contents: read
+      packages: write
     
     steps:
       - name: Checkout code
@@ -77,9 +85,6 @@ jobs:
           build-args: |
             API_URL=http://backend:3001
             NODE_ENV=production
-        permissions:
-          contents: read
-          packages: write
             
       # Build and push backend image  
       - name: Build and push Backend Docker image
@@ -87,11 +92,8 @@ jobs:
         with:
           context: ./backend
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/taskmaster-backend:${{ github.sha }},ghcr.io/${{ github.repository_owner }}/taskmaster-backend:latest
-        permissions:
-          contents: read
-          packages: write
-
+          tags: ghcr.io/${{ github.repository_owner == 'Oumardev' && 'oumardev' || github.repository_owner }}/taskmaster-backend:${{ github.sha }},ghcr.io/${{ github.repository_owner == 'Oumardev' && 'oumardev' || github.repository_owner }}/taskmaster-backend:latest
+            
   deploy:
     needs: build-docker
     runs-on: ubuntu-latest

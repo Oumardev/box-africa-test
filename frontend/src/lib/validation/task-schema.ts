@@ -9,24 +9,24 @@ export const taskSchema = z.object({
     .string()
     .min(3, { message: 'Le titre doit comporter au moins 3 caractères' })
     .max(100, { message: 'Le titre ne peut pas dépasser 100 caractères' }),
-  
+
   description: z
     .string()
     .min(10, { message: 'La description doit comporter au moins 10 caractères' })
     .max(1000, { message: 'La description ne peut pas dépasser 1000 caractères' }),
-  
+
   status: z.enum(['todo', 'in_progress', 'review', 'completed', 'cancelled'] as const, {
     required_error: 'Veuillez sélectionner un statut',
   }),
-  
+
   priority: z.enum(['low', 'medium', 'high', 'urgent'] as const, {
     required_error: 'Veuillez sélectionner une priorité',
   }),
-  
+
   dueDate: z.date().nullable().optional(),
-  
+
   assigneeId: z.string().optional(),
-  
+
   tags: z.array(z.string()).optional().default([]),
 });
 

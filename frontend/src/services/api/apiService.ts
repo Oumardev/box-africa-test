@@ -12,7 +12,7 @@ const API_URL = 'http://localhost:3001';
  */
 const defaultHeaders = {
   'Content-Type': 'application/json',
-  'Authorization': 'Bearer fake-jwt-token', // Token fictif pour démonstration
+  Authorization: 'Bearer fake-jwt-token', // Token fictif pour démonstration
 };
 
 /**
@@ -25,7 +25,7 @@ const handleApiError = async (response: Response) => {
       const errorData = await response.json();
       throw new Error(errorData.message || `Erreur API: ${response.status}`);
     } catch (error) {
-      // En cas d'erreur lors du parsing JSON
+      console.error('Erreur lors du parsing JSON:', error);
       throw new Error(`Erreur API: ${response.status}`);
     }
   }
@@ -45,7 +45,7 @@ export const apiService = {
         method: 'GET',
         headers: defaultHeaders,
       });
-      
+
       await handleApiError(response);
       return await response.json();
     } catch (error) {
@@ -63,7 +63,7 @@ export const apiService = {
         method: 'GET',
         headers: defaultHeaders,
       });
-      
+
       await handleApiError(response);
       return await response.json();
     } catch (error) {
@@ -82,7 +82,7 @@ export const apiService = {
         headers: defaultHeaders,
         body: JSON.stringify(task),
       });
-      
+
       await handleApiError(response);
       return await response.json();
     } catch (error) {
@@ -101,7 +101,7 @@ export const apiService = {
         headers: defaultHeaders,
         body: JSON.stringify(task),
       });
-      
+
       await handleApiError(response);
       return await response.json();
     } catch (error) {
@@ -119,7 +119,7 @@ export const apiService = {
         method: 'DELETE',
         headers: defaultHeaders,
       });
-      
+
       await handleApiError(response);
     } catch (error) {
       console.error(`Erreur lors de la suppression de la tâche ${id}:`, error);
@@ -136,14 +136,14 @@ export const apiService = {
         method: 'GET',
         headers: defaultHeaders,
       });
-      
+
       await handleApiError(response);
       return await response.json();
     } catch (error) {
       console.error('Erreur lors de la récupération des utilisateurs:', error);
       throw error;
     }
-  }
+  },
 };
 
 export default apiService;

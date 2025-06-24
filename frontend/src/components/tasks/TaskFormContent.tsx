@@ -1,5 +1,5 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Resolver, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTheme } from '@/theme/ThemeContext';
 import { useUsers } from '@/hooks/useUsers';
@@ -21,15 +21,34 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 // ShadCN Components
-import { Form, FormControl as ShadcnFormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/shadcn/form';
+import {
+  Form,
+  FormControl as ShadcnFormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/shadcn/form';
 import { Input } from '@/components/ui/shadcn/input';
-import { Select as ShadcnSelect, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup } from '@/components/ui/shadcn/select';
+import {
+  Select as ShadcnSelect,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectGroup,
+} from '@/components/ui/shadcn/select';
 import { Textarea } from '@/components/ui/shadcn/textarea';
 import { Button as ShadcnButton } from '@/components/ui/shadcn/button';
 import { format } from 'date-fns';
 
 // Validation and Types
-import { TaskFormValues, taskSchema, taskPriorityOptions, taskStatusOptions } from '@/lib/validation/task-schema';
+import {
+  TaskFormValues,
+  taskSchema,
+  taskPriorityOptions,
+  taskStatusOptions,
+} from '@/lib/validation/task-schema';
 
 interface TaskFormContentProps {
   defaultValues?: Partial<TaskFormValues>;
@@ -48,8 +67,8 @@ export const TaskFormContent: React.FC<TaskFormContentProps> = ({
   isEditMode = false,
 }) => {
   const { currentTheme } = useTheme();
-  const { getUsers } = useUsers();
-  const { data: users = [] } = getUsers();
+  const { useUsersList } = useUsers();
+  const { data: users = [] } = useUsersList();
 
   // Valeurs par défaut pour un nouveau formulaire
   const emptyDefaultValues: TaskFormValues = {
@@ -61,27 +80,28 @@ export const TaskFormContent: React.FC<TaskFormContentProps> = ({
     assigneeId: undefined,
     tags: [],
   };
-  
+
   // Normaliser les valeurs par défaut pour éviter les erreurs de type
-  const normalizeDefaultValues = (values: Partial<TaskFormValues> = {}): Partial<TaskFormValues> => {
+  const normalizeDefaultValues = (
+    values: Partial<TaskFormValues> = {},
+  ): Partial<TaskFormValues> => {
     const normalized = { ...values };
-    
+
     // Convertir assigneeId en string si c'est un nombre
     if (normalized.assigneeId !== undefined && normalized.assigneeId !== null) {
       normalized.assigneeId = String(normalized.assigneeId);
     }
-    
+
     // Convertir dueDate en objet Date si c'est une chaîne
     if (normalized.dueDate && typeof normalized.dueDate === 'string') {
       normalized.dueDate = new Date(normalized.dueDate);
     }
-    
+
     return normalized;
   };
 
-  // Configuration du formulaire avec React Hook Form et Zod
-  // On utilise un cast pour éviter les problèmes de type avec le resolver
-  const resolver = zodResolver(taskSchema) as any;
+  // Using explicit type for the resolver to match React Hook Form's expectations
+  const resolver = zodResolver(taskSchema) as unknown as Resolver<TaskFormValues>;
 
   const form = useForm<TaskFormValues>({
     resolver,
@@ -89,14 +109,18 @@ export const TaskFormContent: React.FC<TaskFormContentProps> = ({
   });
 
   // Gestion de la soumission du formulaire
-  const handleSubmit = (data: TaskFormValues) => {
+  const handleSubmit: SubmitHandler<TaskFormValues> = (data) => {
     // Normaliser les données avant la soumission pour éviter les erreurs de type
     const normalizedData = {
       ...data,
       assigneeId: data.assigneeId ? String(data.assigneeId) : undefined,
-      dueDate: data.dueDate ? (typeof data.dueDate === 'string' ? new Date(data.dueDate) : data.dueDate) : undefined
+      dueDate: data.dueDate
+        ? typeof data.dueDate === 'string'
+          ? new Date(data.dueDate)
+          : data.dueDate
+        : undefined,
     };
-    
+
     onSubmit(normalizedData);
   };
 
@@ -134,7 +158,7 @@ export const TaskFormContent: React.FC<TaskFormContentProps> = ({
                   {...form.register('status')}
                   defaultValue={form.getValues('status')}
                 >
-                  {taskStatusOptions.map(option => (
+                  {taskStatusOptions.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.label}
                     </MenuItem>
@@ -153,7 +177,7 @@ export const TaskFormContent: React.FC<TaskFormContentProps> = ({
                   {...form.register('priority')}
                   defaultValue={form.getValues('priority')}
                 >
-                  {taskPriorityOptions.map(option => (
+                  {taskPriorityOptions.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.label}
                     </MenuItem>
@@ -187,7 +211,7 @@ export const TaskFormContent: React.FC<TaskFormContentProps> = ({
                   defaultValue={form.getValues('assigneeId') || ''}
                 >
                   <MenuItem value="">Non assigné</MenuItem>
-                  {users.map(user => (
+                  {users.map((user) => (
                     <MenuItem key={user.id} value={user.id.toString()}>
                       {user.name}
                     </MenuItem>
@@ -195,21 +219,17 @@ export const TaskFormContent: React.FC<TaskFormContentProps> = ({
                 </Select>
               </FormControl>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }} component="div" sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 2 }}>
+            <Grid
+              size={{ xs: 12, sm: 6 }}
+              component="div"
+              sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 2 }}
+            >
               {onCancel && (
-                <MuiButton
-                  variant="outlined"
-                  color="secondary"
-                  onClick={onCancel}
-                >
+                <MuiButton variant="outlined" color="secondary" onClick={onCancel}>
                   Annuler
                 </MuiButton>
               )}
-              <MuiButton
-                type="submit"
-                variant="contained"
-                color="primary"
-              >
+              <MuiButton type="submit" variant="contained" color="primary">
                 {isEditMode ? 'Enregistrer' : 'Ajouter'}
               </MuiButton>
             </Grid>
@@ -244,7 +264,11 @@ export const TaskFormContent: React.FC<TaskFormContentProps> = ({
             <FormItem>
               <FormLabel>Description</FormLabel>
               <ShadcnFormControl>
-                <Textarea placeholder="Description détaillée de la tâche" className="min-h-[120px]" {...field} />
+                <Textarea
+                  placeholder="Description détaillée de la tâche"
+                  className="min-h-[120px]"
+                  {...field}
+                />
               </ShadcnFormControl>
               <FormMessage />
             </FormItem>
@@ -262,17 +286,14 @@ export const TaskFormContent: React.FC<TaskFormContentProps> = ({
               return (
                 <FormItem>
                   <FormLabel>Statut</FormLabel>
-                  <ShadcnSelect
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  <ShadcnSelect onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un statut" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="max-w-[240px]">
-                      {taskStatusOptions.map(option => (
+                      {taskStatusOptions.map((option) => (
                         <SelectItem key={option.value} value={option.value}>
                           {option.label}
                         </SelectItem>
@@ -281,7 +302,7 @@ export const TaskFormContent: React.FC<TaskFormContentProps> = ({
                   </ShadcnSelect>
                   <FormMessage />
                 </FormItem>
-              )
+              );
             }}
           />
 
@@ -291,10 +312,7 @@ export const TaskFormContent: React.FC<TaskFormContentProps> = ({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Priorité</FormLabel>
-                <ShadcnSelect
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                <ShadcnSelect onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner une priorité" />
@@ -302,7 +320,7 @@ export const TaskFormContent: React.FC<TaskFormContentProps> = ({
                   </FormControl>
                   <SelectContent>
                     <SelectGroup>
-                      {taskPriorityOptions.map(option => (
+                      {taskPriorityOptions.map((option) => (
                         <SelectItem key={option.value} value={option.value}>
                           {option.label}
                         </SelectItem>
@@ -333,7 +351,7 @@ export const TaskFormContent: React.FC<TaskFormContentProps> = ({
 
                   <SelectContent>
                     <SelectGroup>
-                      {users.map(user => (
+                      {users.map((user) => (
                         <SelectItem key={user.id} value={user.id.toString()}>
                           {user.name}
                         </SelectItem>
@@ -351,9 +369,11 @@ export const TaskFormContent: React.FC<TaskFormContentProps> = ({
             name="dueDate"
             render={({ field }) => {
               // S'assurer que la date est un objet Date et non une chaîne
-              const dateValue = field.value ?
-                (typeof field.value === 'string' ? new Date(field.value) : field.value) :
-                null;
+              const dateValue = field.value
+                ? typeof field.value === 'string'
+                  ? new Date(field.value)
+                  : field.value
+                : null;
 
               return (
                 <FormItem className="flex flex-col">
@@ -370,24 +390,18 @@ export const TaskFormContent: React.FC<TaskFormContentProps> = ({
                   </ShadcnFormControl>
                   <FormMessage />
                 </FormItem>
-              )
+              );
             }}
           />
         </div>
 
         <div className="flex justify-end space-x-2 pt-4">
           {onCancel && (
-            <ShadcnButton
-              type="button"
-              variant="outline"
-              onClick={onCancel}
-            >
+            <ShadcnButton type="button" variant="outline" onClick={onCancel}>
               Annuler
             </ShadcnButton>
           )}
-          <ShadcnButton type="submit">
-            {isEditMode ? 'Modifier' : 'Ajouter'}
-          </ShadcnButton>
+          <ShadcnButton type="submit">{isEditMode ? 'Modifier' : 'Ajouter'}</ShadcnButton>
         </div>
       </form>
     </Form>

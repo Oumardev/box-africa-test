@@ -17,7 +17,7 @@ export const FilterProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     status: null,
     priority: null,
     assigneeId: null,
-    search: ''
+    search: '',
   });
 
   // Réinitialiser les filtres
@@ -26,7 +26,7 @@ export const FilterProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       status: null,
       priority: null,
       assigneeId: null,
-      search: ''
+      search: '',
     });
   };
 
@@ -41,7 +41,7 @@ export const FilterProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 export const useFilter = () => {
   const context = useContext(FilterContext);
   if (context === undefined) {
-    throw new Error('useFilter doit être utilisé à l\'intérieur d\'un FilterProvider');
+    throw new Error("useFilter doit être utilisé à l'intérieur d'un FilterProvider");
   }
   return context;
 };

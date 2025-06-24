@@ -1,8 +1,8 @@
 'use client';
 
-import { Task, TaskFilter, TaskFormValues, TaskPriority, TaskStatus } from '@/types/task';
+import { Task, TaskFormValues } from '@/types/task';
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
-import { useMemo, useCallback } from 'react';
+import { useMemo } from 'react';
 import { taskUseCases } from '@/services/useCases/taskUseCases';
 import { toast } from 'sonner';
 import { useFilter } from '@/context/FilterContext';
@@ -15,19 +15,24 @@ export const useTasks = () => {
   const queryClient = useQueryClient();
 
   // Utiliser le contexte de filtre global
-  const { filter, setFilter, resetFilters } = useFilter();
+  const { filter } = useFilter();
 
   // Clés de cache React Query
   const TASKS_KEYS = {
     all: ['tasks'] as const,
     lists: () => [...TASKS_KEYS.all, 'list'] as const,
-    list: (filters: any) => [...TASKS_KEYS.lists(), { filters }] as const,
+    list: (filters: Record<string, unknown>) => [...TASKS_KEYS.lists(), { filters }] as const,
     details: () => [...TASKS_KEYS.all, 'detail'] as const,
     detail: (id: string | number) => [...TASKS_KEYS.details(), id] as const,
   };
 
   // Récupérer toutes les tâches puis appliquer les filtres sur le résultat
-  const { data: allTasks = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: allTasks = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: TASKS_KEYS.all,
     queryFn: async () => {
       const result = await taskUseCases.getAllTasks();
@@ -37,9 +42,6 @@ export const useTasks = () => {
       return result.data;
     },
   });
-  
-  // Force la réactivité - Cette clé change quand les filtres changent
-  const filterKey = JSON.stringify(filter);
 
   // Appliquer les filtres sur les tâches récupérées
   const filteredTasks = useMemo(() => {
@@ -49,41 +51,41 @@ export const useTasks = () => {
     }
 
     let filteredResult = [...allTasks]; // Copie des tâches pour le filtrage
-    let tasksRemovedByFilter = {
+    const tasksRemovedByFilter = {
       byStatus: 0,
       byPriority: 0,
       byAssignee: 0,
-      bySearch: 0
+      bySearch: 0,
     };
 
     // 1. Filtrage par statut
     if (filter.status && filter.status !== 'all') {
       const initialCount = filteredResult.length;
-      
-      filteredResult = filteredResult.filter(task => task.status === filter.status);
-      
+
+      filteredResult = filteredResult.filter((task) => task.status === filter.status);
+
       tasksRemovedByFilter.byStatus = initialCount - filteredResult.length;
     }
 
     // 2. Filtrage par priorité
     if (filter.priority && filter.priority !== 'all') {
       const initialCount = filteredResult.length;
-      
-      filteredResult = filteredResult.filter(task => task.priority === filter.priority);
-      
+
+      filteredResult = filteredResult.filter((task) => task.priority === filter.priority);
+
       tasksRemovedByFilter.byPriority = initialCount - filteredResult.length;
     }
 
     // 3. Filtrage par assigné
     if (filter.assigneeId) {
       const initialCount = filteredResult.length;
-      
+
       if (filter.assigneeId === 'unassigned') {
-        filteredResult = filteredResult.filter(task => !task.assigneeId);
+        filteredResult = filteredResult.filter((task) => !task.assigneeId);
       } else if (filter.assigneeId !== 'all_assignees') {
-        filteredResult = filteredResult.filter(task => task.assigneeId === filter.assigneeId);
+        filteredResult = filteredResult.filter((task) => task.assigneeId === filter.assigneeId);
       }
-      
+
       tasksRemovedByFilter.byAssignee = initialCount - filteredResult.length;
     }
 
@@ -91,31 +93,23 @@ export const useTasks = () => {
     if (filter.search && filter.search.trim() !== '') {
       const query = filter.search.toLowerCase().trim();
       const initialCount = filteredResult.length;
-      
-      filteredResult = filteredResult.filter(task => {
+
+      filteredResult = filteredResult.filter((task) => {
         const titleMatch = task.title.toLowerCase().includes(query);
         const descMatch = task.description && task.description.toLowerCase().includes(query);
         return titleMatch || descMatch;
       });
-      
+
       tasksRemovedByFilter.bySearch = initialCount - filteredResult.length;
     }
 
     return filteredResult;
-  }, [allTasks, filter, filterKey]);
+  }, [allTasks, filter]);
 
+  // Fonction wrapper pour accéder aux tâches individuelles (à utiliser en dehors des composants)
   const getTask = (id: number | string) => {
-    return useQuery({
-      queryKey: TASKS_KEYS.detail(id),
-      queryFn: async () => {
-        const result = await taskUseCases.getTaskById(Number(id));
-        if (!result.success) {
-          throw new Error(result.error);
-        }
-        return result.data;
-      },
-      enabled: !!id,
-    });
+    // Récupération synchrone depuis le cache si disponible
+    return queryClient.getQueryData(TASKS_KEYS.detail(id)) as Task | undefined;
   };
 
   const createTask = useMutation({
@@ -167,14 +161,12 @@ export const useTasks = () => {
 
   // Compter les filtres actifs
   const activeFiltersCount = useMemo(() => {
-    return Object.entries(filter).filter(
-      ([key, value]) => {
-        // Si la clé est search, vérifier qu'elle n'est pas vide
-        if (key === 'search') return value && value.trim() !== '';
-        // Pour les autres filtres, vérifier qu'ils ne sont ni null ni undefined
-        return value !== null && value !== undefined;
-      }
-    ).length;
+    return Object.entries(filter).filter(([key, value]) => {
+      // Si la clé est search, vérifier qu'elle n'est pas vide
+      if (key === 'search') return value && value.trim() !== '';
+      // Pour les autres filtres, vérifier qu'ils ne sont ni null ni undefined
+      return value !== null && value !== undefined;
+    }).length;
   }, [filter]);
 
   // Log du filtre actuel pour débogage
@@ -182,7 +174,7 @@ export const useTasks = () => {
 
   // Log avant de retourner l'objet pour voir ce qui est passé au composant
   console.log('HOOK: RETOURNE FILTEREDTASKS AVEC', filteredTasks.length, 'ELEMENTS');
-  
+
   return {
     // Nouvelle API plus simple
     data: filteredTasks,
@@ -200,7 +192,7 @@ export const useTasks = () => {
     deleteTask,
     // Exposer les filtres et leur gestion
     filter,
-    activeFiltersCount
+    activeFiltersCount,
   };
 };
 

@@ -1,4 +1,5 @@
 import { taskUseCases } from '../taskUseCases';
+import { TaskFormValues } from '../../../types/task';
 import apiService from '@/services/api/apiService';
 import { toast } from 'sonner';
 
@@ -14,7 +15,7 @@ describe('Task Use Cases', () => {
     it('devrait récupérer avec succès toutes les tâches', async () => {
       const mockTasks = [
         { id: 1, title: 'Tâche 1' },
-        { id: 2, title: 'Tâche 2' }
+        { id: 2, title: 'Tâche 2' },
       ];
       (apiService.getTasks as jest.Mock).mockResolvedValue(mockTasks);
 
@@ -47,7 +48,7 @@ describe('Task Use Cases', () => {
       expect(apiService.getTask).toHaveBeenCalledWith(1);
     });
 
-    it('devrait gérer les erreurs lors de la récupération d\'une tâche', async () => {
+    it("devrait gérer les erreurs lors de la récupération d'une tâche", async () => {
       const errorMessage = 'Tâche non trouvée';
       (apiService.getTask as jest.Mock).mockRejectedValue(new Error(errorMessage));
 
@@ -64,28 +65,30 @@ describe('Task Use Cases', () => {
         title: 'Nouvelle tâche',
         description: 'Description',
         status: 'todo',
-        priority: 'medium'
+        priority: 'medium',
       };
       const createdTask = { id: 3, ...taskData, comments: [], attachments: [] };
       (apiService.createTask as jest.Mock).mockResolvedValue(createdTask);
 
-      const result = await taskUseCases.createTask(taskData as any);
+      const result = await taskUseCases.createTask(taskData as TaskFormValues);
 
       expect(result.success).toBe(true);
       expect(result.data).toEqual(createdTask);
-      expect(apiService.createTask).toHaveBeenCalledWith(expect.objectContaining({
-        ...taskData,
-        comments: [],
-        attachments: []
-      }));
+      expect(apiService.createTask).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...taskData,
+          comments: [],
+          attachments: [],
+        }),
+      );
       expect(toast.success).toHaveBeenCalledWith('Tâche créée avec succès');
     });
 
-    it('devrait gérer les erreurs lors de la création d\'une tâche', async () => {
+    it("devrait gérer les erreurs lors de la création d'une tâche", async () => {
       const errorMessage = 'Validation échouée';
       (apiService.createTask as jest.Mock).mockRejectedValue(new Error(errorMessage));
 
-      const result = await taskUseCases.createTask({} as any);
+      const result = await taskUseCases.createTask({} as TaskFormValues);
       expect(result.success).toBe(false);
       expect(result.error).toContain(errorMessage);
       expect(toast.error).toHaveBeenCalledWith(expect.stringContaining(errorMessage));
@@ -105,7 +108,7 @@ describe('Task Use Cases', () => {
       expect(toast.success).toHaveBeenCalledWith('Tâche mise à jour avec succès');
     });
 
-    it('devrait gérer les erreurs lors de la mise à jour d\'une tâche', async () => {
+    it("devrait gérer les erreurs lors de la mise à jour d'une tâche", async () => {
       const errorMessage = 'Tâche non trouvée';
       (apiService.updateTask as jest.Mock).mockRejectedValue(new Error(errorMessage));
       const result = await taskUseCases.updateTask(999, {});
@@ -125,7 +128,7 @@ describe('Task Use Cases', () => {
       expect(toast.success).toHaveBeenCalledWith('Tâche supprimée avec succès');
     });
 
-    it('devrait gérer les erreurs lors de la suppression d\'une tâche', async () => {
+    it("devrait gérer les erreurs lors de la suppression d'une tâche", async () => {
       const errorMessage = 'Erreur de serveur';
       (apiService.deleteTask as jest.Mock).mockRejectedValue(new Error(errorMessage));
       const result = await taskUseCases.deleteTask(999);
@@ -139,7 +142,7 @@ describe('Task Use Cases', () => {
     it('devrait récupérer les utilisateurs avec succès', async () => {
       const mockUsers = [
         { id: 1, name: 'Alice Dupont' },
-        { id: 2, name: 'Jean Martin' }
+        { id: 2, name: 'Jean Martin' },
       ];
       (apiService.getUsers as jest.Mock).mockResolvedValue(mockUsers);
       const result = await taskUseCases.getUsers();

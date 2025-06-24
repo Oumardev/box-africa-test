@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
 import { Toaster } from 'sonner';
-import { ThemeProvider } from "@/theme/ThemeContext";
+import { ThemeProvider } from '@/theme/ThemeContext';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import CssBaseline from '@mui/material/CssBaseline';

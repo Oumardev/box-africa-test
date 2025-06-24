@@ -12,22 +12,16 @@ export interface ButtonProps extends MuiButtonProps {
 /**
  * Composant Button avec le style Material UI
  */
-export const Button: React.FC<ButtonProps> = ({ 
-  children, 
-  variant = 'contained', 
-  color = 'primary', 
+export const Button: React.FC<ButtonProps> = ({
+  children,
+  variant = 'contained',
+  color = 'primary',
   fullWidth = false,
   size = 'medium',
-  ...props 
+  ...props
 }) => {
   return (
-    <MuiButton
-      variant={variant}
-      color={color}
-      fullWidth={fullWidth}
-      size={size}
-      {...props}
-    >
+    <MuiButton variant={variant} color={color} fullWidth={fullWidth} size={size} {...props}>
       {children}
     </MuiButton>
   );

@@ -18,26 +18,17 @@
   ],
   "tasks": [
     {
-      "id": "1",
       "title": "Mise en place de l'architecture frontend",
-      "description": "Définir et implémenter l'architecture modulaire du frontend avec Next.js en utilisant les principes de clean architecture",
+      "description": "Définir et implémenter l'architecture modulaire du frontend avec Next.js en utilisant les principes de clean architectures",
       "status": "completed",
       "priority": "high",
-      "dueDate": "2025-06-10T00:00:00.000Z",
-      "assigneeId": 1,
-      "comments": [
-        {
-          "id": 1,
-          "content": "Architecture validée par l'équipe",
-          "userId": 2,
-          "createdAt": "2025-06-05T14:30:00.000Z"
-        }
-      ],
-      "attachments": [],
+      "assigneeId": "1",
       "tags": [
         "frontend",
         "architecture"
-      ]
+      ],
+      "dueDate": "2025-06-10T00:00:00.000Z",
+      "id": "1"
     },
     {
       "title": "Développer la gestion de thèmes UI",
@@ -100,6 +91,19 @@
       ],
       "dueDate": "2025-06-30T00:00:00.000Z",
       "id": "5"
+    },
+    {
+      "id": "1d14",
+      "title": "Studio",
+      "description": "Enregistrement chez Tiakola",
+      "status": "review",
+      "priority": "urgent",
+      "assigneeId": "2",
+      "tags": [],
+      "dueDate": "2025-06-28T00:00:00.000Z",
+      "creatorId": "user1",
+      "comments": [],
+      "attachments": []
     }
   ]
 }

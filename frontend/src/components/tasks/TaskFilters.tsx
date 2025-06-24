@@ -1,33 +1,36 @@
 import React, { useMemo } from 'react';
 import { useTheme } from '@/theme/ThemeContext';
-import { useTasks } from '@/hooks/useTasks';
 import { useFilter } from '@/context/FilterContext';
 import { useUsers } from '@/hooks/useUsers';
 import { taskPriorityOptions, taskStatusOptions } from '@/lib/validation/task-schema';
 import { TaskStatus, TaskPriority } from '@/types/task';
 
 // Material UI Components
-import { 
-  Paper, 
-  Grid, 
-  FormControl, 
-  InputLabel, 
-  Select, 
-  MenuItem, 
+import {
+  Paper,
+  Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
   TextField,
   IconButton,
   Chip,
   Box,
   Typography,
-  useMediaQuery,
-  useTheme as useMuiTheme,
 } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
 
 // ShadCN Components
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
-import { Select as ShadcnSelect, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/shadcn/select';
+import {
+  Select as ShadcnSelect,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/shadcn/select';
 import { Input } from '@/components/ui/shadcn/input';
 import { Button } from '@/components/ui/shadcn/button';
 import { Label } from '@/components/ui/shadcn/label';
@@ -39,21 +42,19 @@ import { Badge } from '@/components/ui/shadcn/badge';
  */
 export const TaskFilters: React.FC = () => {
   const { currentTheme } = useTheme();
-  const muiTheme = useMuiTheme();
-  const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
-  const { getUsers } = useUsers();
-  const { data: users = [] } = getUsers();
-  
+  const { useUsersList } = useUsers();
+  const { data: users = [] } = useUsersList();
+
   // Utiliser le contexte de filtre global
   const { filter, setFilter: updateFilter, resetFilters } = useFilter();
-  
+
   // Calcul des filtres actifs avec useMemo pour éviter les calculs inutiles
   const activeFiltersCount = useMemo(() => {
-    return Object.values(filter).filter(value => 
-      value !== null && value !== undefined && value !== ''
+    return Object.values(filter).filter(
+      (value) => value !== null && value !== undefined && value !== '',
     ).length;
   }, [filter]);
-  
+
   // Rendu pour Material UI
   if (currentTheme === 'material') {
     return (
@@ -66,7 +67,7 @@ export const TaskFilters: React.FC = () => {
             </Typography>
           </Box>
           {activeFiltersCount > 0 && (
-            <Chip 
+            <Chip
               label={`${activeFiltersCount} ${activeFiltersCount > 1 ? 'filtres actifs' : 'filtre actif'}`}
               color="primary"
               size="small"
@@ -75,7 +76,7 @@ export const TaskFilters: React.FC = () => {
             />
           )}
         </Box>
-        
+
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <TextField
@@ -87,18 +88,22 @@ export const TaskFilters: React.FC = () => {
               placeholder="Titre ou description"
             />
           </Grid>
-          
+
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <FormControl fullWidth size="small">
               <InputLabel>Statut</InputLabel>
               <Select
                 value={String(filter.status || '')}
-                onChange={(e) => updateFilter({ status: e.target.value === '' ? null : (e.target.value as TaskStatus) })}
+                onChange={(e) =>
+                  updateFilter({
+                    status: e.target.value === '' ? null : (e.target.value as TaskStatus),
+                  })
+                }
                 label="Statut"
                 displayEmpty
               >
                 <MenuItem value="">Tous les statuts</MenuItem>
-                {taskStatusOptions.map(option => (
+                {taskStatusOptions.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
                   </MenuItem>
@@ -106,18 +111,22 @@ export const TaskFilters: React.FC = () => {
               </Select>
             </FormControl>
           </Grid>
-          
+
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <FormControl fullWidth size="small">
               <InputLabel>Priorité</InputLabel>
               <Select
                 value={String(filter.priority || '')}
-                onChange={(e) => updateFilter({ priority: e.target.value === '' ? null : (e.target.value as TaskPriority) })}
+                onChange={(e) =>
+                  updateFilter({
+                    priority: e.target.value === '' ? null : (e.target.value as TaskPriority),
+                  })
+                }
                 label="Priorité"
                 displayEmpty
               >
                 <MenuItem value="">Toutes les priorités</MenuItem>
-                {taskPriorityOptions.map(option => (
+                {taskPriorityOptions.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
                   </MenuItem>
@@ -125,13 +134,15 @@ export const TaskFilters: React.FC = () => {
               </Select>
             </FormControl>
           </Grid>
-          
+
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <FormControl fullWidth size="small">
               <InputLabel>Assigné à</InputLabel>
               <Select
                 value={String(filter.assigneeId || '')}
-                onChange={(e) => updateFilter({ assigneeId: e.target.value === '' ? null : e.target.value })}
+                onChange={(e) =>
+                  updateFilter({ assigneeId: e.target.value === '' ? null : e.target.value })
+                }
                 label="Assigné à"
                 displayEmpty
               >
@@ -145,12 +156,12 @@ export const TaskFilters: React.FC = () => {
               </Select>
             </FormControl>
           </Grid>
-          
+
           {activeFiltersCount > 0 && (
             <Grid size={{ xs: 12 }} sx={{ display: { xs: 'block', sm: 'none' }, mt: 1 }}>
-              <IconButton 
-                onClick={resetFilters} 
-                size="small" 
+              <IconButton
+                onClick={resetFilters}
+                size="small"
                 color="primary"
                 sx={{ ml: 'auto', display: 'flex' }}
               >
@@ -165,7 +176,7 @@ export const TaskFilters: React.FC = () => {
       </Paper>
     );
   }
-  
+
   // Rendu pour ShadCN
   return (
     <Card className="mb-6">
@@ -175,7 +186,7 @@ export const TaskFilters: React.FC = () => {
             <Filter className="mr-2 h-5 w-5" />
             <CardTitle>Filtres</CardTitle>
           </div>
-          
+
           {activeFiltersCount > 0 && (
             <Badge className="flex items-center gap-1 cursor-pointer" onClick={resetFilters}>
               {activeFiltersCount} {activeFiltersCount > 1 ? 'filtres actifs' : 'filtre actif'}
@@ -184,7 +195,7 @@ export const TaskFilters: React.FC = () => {
           )}
         </div>
       </CardHeader>
-      
+
       <CardContent>
         <div className="grid gap-4 md:grid-cols-4 sm:grid-cols-2 grid-cols-1">
           <div className="space-y-2">
@@ -196,19 +207,21 @@ export const TaskFilters: React.FC = () => {
               onChange={(e) => updateFilter({ search: e.target.value })}
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="status">Statut</Label>
             <ShadcnSelect
               value={String(filter.status || '')}
-              onValueChange={(value) => updateFilter({ status: value === 'all_status' ? null : (value as TaskStatus) })}
+              onValueChange={(value) =>
+                updateFilter({ status: value === 'all_status' ? null : (value as TaskStatus) })
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Tous les statuts" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all_status">Tous les statuts</SelectItem>
-                {taskStatusOptions.map(option => (
+                {taskStatusOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
@@ -216,19 +229,23 @@ export const TaskFilters: React.FC = () => {
               </SelectContent>
             </ShadcnSelect>
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="priority">Priorité</Label>
             <ShadcnSelect
               value={String(filter.priority || '')}
-              onValueChange={(value) => updateFilter({ priority: value === 'all_priority' ? null : (value as TaskPriority) })}
+              onValueChange={(value) =>
+                updateFilter({
+                  priority: value === 'all_priority' ? null : (value as TaskPriority),
+                })
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Toutes les priorités" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all_priority">Toutes les priorités</SelectItem>
-                {taskPriorityOptions.map(option => (
+                {taskPriorityOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
@@ -236,12 +253,14 @@ export const TaskFilters: React.FC = () => {
               </SelectContent>
             </ShadcnSelect>
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="assignee">Assigné à</Label>
             <ShadcnSelect
               value={String(filter.assigneeId || '')}
-              onValueChange={(value) => updateFilter({ assigneeId: value === 'all_assignees' ? null : value })}
+              onValueChange={(value) =>
+                updateFilter({ assigneeId: value === 'all_assignees' ? null : value })
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Tous les assignés" />
@@ -258,15 +277,10 @@ export const TaskFilters: React.FC = () => {
             </ShadcnSelect>
           </div>
         </div>
-        
+
         {activeFiltersCount > 0 && (
           <div className="mt-4 flex justify-end sm:hidden">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={resetFilters}
-              className="flex items-center"
-            >
+            <Button variant="ghost" size="sm" onClick={resetFilters} className="flex items-center">
               <X className="mr-1 h-4 w-4" />
               Réinitialiser les filtres
             </Button>

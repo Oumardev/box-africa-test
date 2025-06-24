@@ -7,11 +7,16 @@ import { useTasks } from '@/hooks/useTasks';
 import { toast } from 'sonner';
 
 // Material UI Components
-import { Dialog as MuiDialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
+import { Dialog as MuiDialog, DialogTitle, DialogContent, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
 // ShadCN Components
-import { Dialog, DialogContent as ShadcnDialogContent, DialogHeader, DialogTitle as ShadcnDialogTitle } from '@/components/ui/shadcn/dialog';
+import {
+  Dialog,
+  DialogContent as ShadcnDialogContent,
+  DialogHeader,
+  DialogTitle as ShadcnDialogTitle,
+} from '@/components/ui/shadcn/dialog';
 import { X } from 'lucide-react';
 
 interface AddTaskDialogProps {
@@ -24,10 +29,10 @@ export const AddTaskDialog: React.FC<AddTaskDialogProps> = ({ open, onClose, onS
   const { currentTheme } = useTheme();
   const addTask = useTaskStore((state) => state.addTask);
   const { createTask } = useTasks();
-  
+
   const handleSubmit = async (data: TaskFormValues) => {
     const { dueDate, ...restData } = data;
-    
+
     try {
       await createTask.mutateAsync({
         ...restData,
@@ -42,21 +47,23 @@ export const AddTaskDialog: React.FC<AddTaskDialogProps> = ({ open, onClose, onS
         dueDate: dueDate === null ? undefined : dueDate,
         assigneeId: data.assigneeId || undefined,
         tags: data.tags || [],
-        creatorId: 'user1', 
-        comments: [], 
+        creatorId: 'user1',
+        comments: [],
         attachments: [],
       });
-      
+
       onClose();
-      
+
       if (onSuccess) {
         onSuccess();
       }
     } catch (error) {
-      toast.error(`Erreur lors de l'ajout de la tâche: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+      toast.error(
+        `Erreur lors de l'ajout de la tâche: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
+      );
     }
   };
-  
+
   // Rendu pour Material UI
   if (currentTheme === 'material') {
     return (
@@ -82,14 +89,14 @@ export const AddTaskDialog: React.FC<AddTaskDialogProps> = ({ open, onClose, onS
       </MuiDialog>
     );
   }
-  
+
   // Rendu pour ShadCN
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <ShadcnDialogContent className="sm:max-w-[600px]">
         <DialogHeader className="relative">
           <ShadcnDialogTitle>Ajouter une nouvelle tâche</ShadcnDialogTitle>
-          <button 
+          <button
             onClick={onClose}
             className="absolute right-0 top-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           >

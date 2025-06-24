@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { TaskManager } from "@/components/tasks/TaskManager";
-import { ThemeSwitcher } from "@/components/theme-switcher/ThemeSwitcher";
-import { Container, Typography, AppBar, Toolbar } from "@mui/material";
-import { useTheme } from "@/theme/ThemeContext";
+import { TaskManager } from '@/components/tasks/TaskManager';
+import { ThemeSwitcher } from '@/components/theme-switcher/ThemeSwitcher';
+import { Container, Typography, AppBar, Toolbar } from '@mui/material';
+import { useTheme } from '@/theme/ThemeContext';
 
 export default function Home() {
   const { currentTheme } = useTheme();

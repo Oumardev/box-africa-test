@@ -89,7 +89,7 @@ const mockTasks: Task[] = [
   {
     id: '3',
     title: 'Intégrer le store Zustand',
-    description: 'Mettre en place la gestion d\'état avec Zustand pour les tâches',
+    description: "Mettre en place la gestion d'état avec Zustand pour les tâches",
     status: 'todo',
     priority: 'high',
     dueDate: new Date(2025, 6, 10),
@@ -181,14 +181,14 @@ export const useTaskStore = create<TaskStore>()(
 
     setStatusFilter: (status) => {
       set((state) => {
-        state.filters.status = status as TaskStatus || null;
+        state.filters.status = (status as TaskStatus) || null;
         state.filteredTasks = filterTasks(state.tasks, state.filters);
       });
     },
 
     setPriorityFilter: (priority) => {
       set((state) => {
-        state.filters.priority = priority as TaskPriority || null;
+        state.filters.priority = (priority as TaskPriority) || null;
         state.filteredTasks = filterTasks(state.tasks, state.filters);
       });
     },
@@ -235,7 +235,7 @@ export const useTaskStore = create<TaskStore>()(
         });
       }
     },
-  }))
+  })),
 );
 
 function filterTasks(tasks: Task[], filters: TaskState['filters']): Task[] {
@@ -249,8 +249,7 @@ function filterTasks(tasks: Task[], filters: TaskState['filters']): Task[] {
     if (filters.assigneeId) {
       if (filters.assigneeId === 'unassigned' && task.assigneeId) {
         return false;
-      }
-      else if (filters.assigneeId !== 'unassigned' && task.assigneeId !== filters.assigneeId) {
+      } else if (filters.assigneeId !== 'unassigned' && task.assigneeId !== filters.assigneeId) {
         return false;
       }
     }
@@ -261,7 +260,11 @@ function filterTasks(tasks: Task[], filters: TaskState['filters']): Task[] {
         task.description.toLowerCase().includes(searchLower);
       if (!matchesSearch) return false;
     }
-    if (filters.dueDateFrom && task.dueDate && new Date(task.dueDate) < new Date(filters.dueDateFrom)) {
+    if (
+      filters.dueDateFrom &&
+      task.dueDate &&
+      new Date(task.dueDate) < new Date(filters.dueDateFrom)
+    ) {
       return false;
     }
     if (filters.dueDateTo && task.dueDate && new Date(task.dueDate) > new Date(filters.dueDateTo)) {

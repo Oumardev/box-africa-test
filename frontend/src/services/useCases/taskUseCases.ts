@@ -3,7 +3,7 @@
  * Couche d'abstraction entre les composants UI et les services API
  */
 
-import { Task, TaskFormValues } from '@/types/task';
+import { Task, TaskFormValues, User } from '@/types/task';
 import apiService from '@/services/api/apiService';
 import { toast } from 'sonner';
 
@@ -27,9 +27,13 @@ export const taskUseCases = {
     try {
       const tasks = await apiService.getTasks();
       return { success: true, data: tasks };
-    } catch (error: any) {
-      toast.error(`Erreur: ${error.message}`);
-      return { success: false, error: error.message || 'Erreur lors de la récupération des tâches' };
+    } catch (error: Error | unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue';
+      toast.error(`Erreur: ${errorMessage}`);
+      return {
+        success: false,
+        error: errorMessage || 'Erreur lors de la récupération des tâches',
+      };
     }
   },
 
@@ -40,9 +44,13 @@ export const taskUseCases = {
     try {
       const task = await apiService.getTask(id);
       return { success: true, data: task };
-    } catch (error: any) {
-      toast.error(`Erreur: ${error.message}`);
-      return { success: false, error: error.message || `Erreur lors de la récupération de la tâche ${id}` };
+    } catch (error: Error | unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue';
+      toast.error(`Erreur: ${errorMessage}`);
+      return {
+        success: false,
+        error: errorMessage || `Erreur lors de la récupération de la tâche ${id}`,
+      };
     }
   },
 
@@ -61,9 +69,10 @@ export const taskUseCases = {
       const task = await apiService.createTask(augmentedData);
       toast.success('Tâche créée avec succès');
       return { success: true, data: task };
-    } catch (error: any) {
-      toast.error(`Erreur: ${error.message}`);
-      return { success: false, error: error.message || 'Erreur lors de la création de la tâche' };
+    } catch (error: Error | unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue';
+      toast.error(`Erreur: ${errorMessage}`);
+      return { success: false, error: errorMessage || 'Erreur lors de la création de la tâche' };
     }
   },
 
@@ -75,9 +84,13 @@ export const taskUseCases = {
       const task = await apiService.updateTask(id, taskData);
       toast.success('Tâche mise à jour avec succès');
       return { success: true, data: task };
-    } catch (error: any) {
-      toast.error(`Erreur: ${error.message}`);
-      return { success: false, error: error.message || `Erreur lors de la mise à jour de la tâche ${id}` };
+    } catch (error: Error | unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue';
+      toast.error(`Erreur: ${errorMessage}`);
+      return {
+        success: false,
+        error: errorMessage || `Erreur lors de la mise à jour de la tâche ${id}`,
+      };
     }
   },
 
@@ -89,24 +102,32 @@ export const taskUseCases = {
       await apiService.deleteTask(id);
       toast.success('Tâche supprimée avec succès');
       return { success: true };
-    } catch (error: any) {
-      toast.error(`Erreur: ${error.message}`);
-      return { success: false, error: error.message || `Erreur lors de la suppression de la tâche ${id}` };
+    } catch (error: Error | unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue';
+      toast.error(`Erreur: ${errorMessage}`);
+      return {
+        success: false,
+        error: errorMessage || `Erreur lors de la suppression de la tâche ${id}`,
+      };
     }
   },
 
   /**
    * Récupère les utilisateurs pour l'assignation de tâches
    */
-  async getUsers(): Promise<OperationResult<any[]>> {
+  async getUsers(): Promise<OperationResult<User[]>> {
     try {
       const users = await apiService.getUsers();
       return { success: true, data: users };
-    } catch (error: any) {
-      toast.error(`Erreur: ${error.message}`);
-      return { success: false, error: error.message || 'Erreur lors de la récupération des utilisateurs' };
+    } catch (error: Error | unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue';
+      toast.error(`Erreur: ${errorMessage}`);
+      return {
+        success: false,
+        error: errorMessage || 'Erreur lors de la récupération des utilisateurs',
+      };
     }
-  }
+  },
 };
 
 export default taskUseCases;

@@ -8,7 +8,6 @@ import DeleteTaskDialog from './DeleteTaskDialog';
 import TaskAssigneeSelector from './TaskAssigneeSelector';
 import { useUsers } from '@/hooks/useUsers';
 
-
 // Material UI Components
 import {
   Card as MuiCard,
@@ -18,8 +17,6 @@ import {
   Chip,
   IconButton,
   Box,
-  Tooltip,
-  Avatar,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -28,7 +25,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
 import { Button } from '@/components/ui/shadcn/button';
 import { Badge } from '@/components/ui/shadcn/badge';
-import { CalendarIcon, Edit, Trash2, User } from 'lucide-react';
+import { CalendarIcon, Edit, Trash2 } from 'lucide-react';
 
 interface TaskCardProps {
   task: Task;
@@ -74,48 +71,20 @@ const statusLabelMap: Record<string, string> = {
 /**
  * Composant d'affichage d'une carte de tâche qui s'adapte au thème actif
  */
-export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDelete }) => {
+export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   const { currentTheme } = useTheme();
-  const { getUsers, findUserById } = useUsers();
-  const { data: users = [] } = getUsers();
+  const { useUsersList, findUserById } = useUsers();
+  const { data: users = [] } = useUsersList();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  
+
   // Fonction utilitaire pour obtenir le nom de l'assigné
   const getAssigneeName = (assigneeId?: string): string => {
     if (!assigneeId) return 'Non assigné';
     const user = findUserById(users, assigneeId);
     return user ? user.name : 'Inconnu';
   };
-  
-  // Gestionnaire pour la mise à jour du statut
-  const handleStatusChange = (newStatus: string) => {
-    if (onStatusChange) {
-      onStatusChange(task.id, newStatus);
-    }
-  };
-  
-  // Gestionnaire pour la suppression
-  const handleDelete = () => {
-    if (onDelete) {
-      onDelete(task.id);
-      setIsDeleteDialogOpen(false);
-    }
-  };
-  
-  // Fonction pour obtenir les initiales de l'assigné
-  const getAssigneeInitials = (assigneeId?: string): string => {
-    if (!assigneeId) return '?';
-    const user = findUserById(users, assigneeId);
-    if (!user) return '?';
-    
-    const nameParts = user.name.split(' ');
-    if (nameParts.length > 1) {
-      return `${nameParts[0][0]}${nameParts[1][0]}`;
-    }
-    return user.name.substring(0, 2).toUpperCase();
-  };
-  
+
   // Rendu pour Material UI
   if (currentTheme === 'material') {
     return (
@@ -127,30 +96,25 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDele
                 {task.title}
               </Typography>
               <Box>
-                <Chip 
-                  label={priorityLabelMap[task.priority]} 
-                  color={priorityColorMap[task.priority] as any}
+                <Chip
+                  label={priorityLabelMap[task.priority]}
+                  color={
+                    priorityColorMap[task.priority] as 'success' | 'info' | 'warning' | 'error'
+                  }
                   size="small"
                   sx={{ mr: 1 }}
                 />
-                <Chip 
-                  label={statusLabelMap[task.status]} 
-                  variant="outlined"
-                  size="small" 
-                />
+                <Chip label={statusLabelMap[task.status]} variant="outlined" size="small" />
               </Box>
             </Box>
-            
+
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               {task.description}
             </Typography>
-            
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <TaskAssigneeSelector 
-                  taskId={task.id} 
-                  currentAssigneeId={task.assigneeId} 
-                />
+                <TaskAssigneeSelector taskId={task.id} currentAssigneeId={task.assigneeId} />
                 <Typography variant="body2" color="text.secondary">
                   {getAssigneeName(task.assigneeId)}
                 </Typography>
@@ -162,33 +126,25 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDele
               )}
             </Box>
           </MuiCardContent>
-          
+
           <MuiCardActions sx={{ justifyContent: 'flex-end', pt: 0 }}>
-            <IconButton 
-              size="small" 
-              color="primary"
-              onClick={() => setIsEditDialogOpen(true)}
-            >
+            <IconButton size="small" color="primary" onClick={() => setIsEditDialogOpen(true)}>
               <EditIcon fontSize="small" />
             </IconButton>
-            <IconButton 
-              size="small" 
-              color="error"
-              onClick={() => setIsDeleteDialogOpen(true)}
-            >
+            <IconButton size="small" color="error" onClick={() => setIsDeleteDialogOpen(true)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </MuiCardActions>
         </MuiCard>
-        
+
         {isEditDialogOpen && (
-          <EditTaskDialog 
-            task={task} 
+          <EditTaskDialog
+            task={task}
             open={isEditDialogOpen}
-            onClose={() => setIsEditDialogOpen(false)} 
+            onClose={() => setIsEditDialogOpen(false)}
           />
         )}
-        
+
         {isDeleteDialogOpen && (
           <DeleteTaskDialog
             task={task}
@@ -199,7 +155,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDele
       </>
     );
   }
-  
+
   // Rendu pour ShadCN
   return (
     <>
@@ -211,27 +167,22 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDele
               <Badge className={priorityClassMap[task.priority]}>
                 {priorityLabelMap[task.priority]}
               </Badge>
-              <Badge variant="outline">
-                {statusLabelMap[task.status]}
-              </Badge>
+              <Badge variant="outline">{statusLabelMap[task.status]}</Badge>
             </div>
           </div>
         </CardHeader>
-        
+
         <CardContent className="pb-2">
           <p className="text-sm text-muted-foreground mb-4">{task.description}</p>
-          
+
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <TaskAssigneeSelector 
-                taskId={task.id} 
-                currentAssigneeId={task.assigneeId} 
-              />
+              <TaskAssigneeSelector taskId={task.id} currentAssigneeId={task.assigneeId} />
               <span className="text-xs text-muted-foreground">
                 {getAssigneeName(task.assigneeId)}
               </span>
             </div>
-            
+
             {task.dueDate && (
               <div className="flex items-center text-xs text-muted-foreground">
                 <CalendarIcon className="mr-1 h-3 w-3" />
@@ -240,17 +191,13 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDele
             )}
           </div>
         </CardContent>
-        
+
         <CardFooter className="pt-2 flex justify-end gap-2">
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => setIsEditDialogOpen(true)}
-          >
+          <Button variant="ghost" size="sm" onClick={() => setIsEditDialogOpen(true)}>
             <Edit className="h-4 w-4 mr-1" /> Modifier
           </Button>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="sm"
             className="text-destructive"
             onClick={() => setIsDeleteDialogOpen(true)}
@@ -259,15 +206,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDele
           </Button>
         </CardFooter>
       </Card>
-      
+
       {isEditDialogOpen && (
-        <EditTaskDialog 
-          task={task} 
+        <EditTaskDialog
+          task={task}
           open={isEditDialogOpen}
-          onClose={() => setIsEditDialogOpen(false)} 
+          onClose={() => setIsEditDialogOpen(false)}
         />
       )}
-      
+
       {isDeleteDialogOpen && (
         <DeleteTaskDialog
           task={task}

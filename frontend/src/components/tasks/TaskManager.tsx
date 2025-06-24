@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useTheme } from '@/theme/ThemeContext';
 import { Task } from '@/types/task';
 import { useTasks } from '@/hooks/useTasks';
-import { useFilter } from '@/context/FilterContext';
 
 // Composants de tâches
 import TaskFilters from './TaskFilters';
@@ -31,9 +30,6 @@ export const TaskManager: React.FC = () => {
   const { isMaterial } = useTheme();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
-  // Récupérer directement le filtre du contexte global
-  const { filter } = useFilter();
-
   // Utiliser le hook pour les opérations CRUD sur les tâches
   const {
     data: filteredTasks = [],
@@ -41,7 +37,7 @@ export const TaskManager: React.FC = () => {
     error: queryError,
     updateTask,
     deleteTask,
-    refetch: refetchTasks
+    refetch: refetchTasks,
   } = useTasks();
 
   // Formater l'erreur
@@ -57,10 +53,10 @@ export const TaskManager: React.FC = () => {
     try {
       await updateTask.mutateAsync({
         id: Number(id),
-        data: { status: status as Task['status'] }
+        data: { status: status as Task['status'] },
       });
     } catch (error) {
-      console.error("Erreur lors de la mise à jour du statut:", error);
+      console.error('Erreur lors de la mise à jour du statut:', error);
     }
   };
 
@@ -69,7 +65,7 @@ export const TaskManager: React.FC = () => {
     try {
       await deleteTask.mutateAsync(Number(id));
     } catch (error) {
-      console.error("Erreur lors de la suppression:", error);
+      console.error('Erreur lors de la suppression:', error);
     }
   };
 
@@ -121,7 +117,9 @@ export const TaskManager: React.FC = () => {
 
     return (
       <div className="bg-muted/50 p-8 text-center rounded-md my-6">
-        <p className="text-muted-foreground">Aucune tâche ne correspond aux filtres sélectionnés.</p>
+        <p className="text-muted-foreground">
+          Aucune tâche ne correspond aux filtres sélectionnés.
+        </p>
       </div>
     );
   };
@@ -134,11 +132,7 @@ export const TaskManager: React.FC = () => {
           <Typography color="textSecondary" paragraph>
             Vous n'avez pas encore ajouté de tâches.
           </Typography>
-          <MuiButton
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleOpenAddDialog}
-          >
+          <MuiButton variant="contained" startIcon={<AddIcon />} onClick={handleOpenAddDialog}>
             Ajouter une tâche
           </MuiButton>
         </Paper>

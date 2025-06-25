@@ -53,7 +53,7 @@ export const EditTaskDialog: React.FC<EditTaskDialogProps> = ({
 
     try {
       await updateTask.mutateAsync({
-        id: Number(task.id),
+        id: task.id,
         data: {
           ...restData,
           dueDate: dueDate === null ? undefined : dueDate,

@@ -94,7 +94,7 @@ export const apiService = {
   /**
    * Met à jour une tâche existante
    */
-  async updateTask(id: number, task: Partial<Task>): Promise<Task> {
+  async updateTask(id: number | string, task: Partial<Task>): Promise<Task> {
     try {
       const response = await fetch(`${API_URL}/tasks/${id}`, {
         method: 'PUT',
@@ -113,7 +113,7 @@ export const apiService = {
   /**
    * Supprime une tâche
    */
-  async deleteTask(id: number): Promise<void> {
+  async deleteTask(id: number | string): Promise<void> {
     try {
       const response = await fetch(`${API_URL}/tasks/${id}`, {
         method: 'DELETE',

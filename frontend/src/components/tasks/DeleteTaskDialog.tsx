@@ -46,7 +46,7 @@ export const DeleteTaskDialog: React.FC<DeleteTaskDialogProps> = ({
 
   const handleDelete = async () => {
     try {
-      await deleteTask.mutateAsync(Number(task.id));
+      await deleteTask.mutateAsync(task.id);
 
       onClose();
 

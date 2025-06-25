@@ -128,7 +128,7 @@ export const useTasks = () => {
   });
 
   const updateTask = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<Task> }) => {
+    mutationFn: ({ id, data }: { id: number | string; data: Partial<Task> }) => {
       return taskUseCases.updateTask(id, data);
     },
     onSuccess: (result) => {
@@ -143,7 +143,7 @@ export const useTasks = () => {
   });
 
   const deleteTask = useMutation({
-    mutationFn: (id: number) => {
+    mutationFn: (id: number | string) => {
       return taskUseCases.deleteTask(id);
     },
     onSuccess: (result) => {

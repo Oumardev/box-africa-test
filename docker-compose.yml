@@ -28,7 +28,7 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - ./backend/db.json:/app/db.json
+      - ./backend:/app
     restart: unless-stopped
     networks:
       - taskmaster-network

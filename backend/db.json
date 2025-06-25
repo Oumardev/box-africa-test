@@ -91,19 +91,6 @@
       ],
       "dueDate": "2025-06-30T00:00:00.000Z",
       "id": "5"
-    },
-    {
-      "id": "1d14",
-      "title": "Studio",
-      "description": "Enregistrement chez Tiakola",
-      "status": "review",
-      "priority": "urgent",
-      "assigneeId": "2",
-      "tags": [],
-      "dueDate": "2025-06-28T00:00:00.000Z",
-      "creatorId": "user1",
-      "comments": [],
-      "attachments": []
     }
   ]
 }

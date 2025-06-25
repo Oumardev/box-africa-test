@@ -79,7 +79,7 @@ export const taskUseCases = {
   /**
    * Met à jour une tâche existante avec gestion d'erreur
    */
-  async updateTask(id: number, taskData: Partial<Task>): Promise<OperationResult<Task>> {
+  async updateTask(id: number | string, taskData: Partial<Task>): Promise<OperationResult<Task>> {
     try {
       const task = await apiService.updateTask(id, taskData);
       toast.success('Tâche mise à jour avec succès');
@@ -97,7 +97,7 @@ export const taskUseCases = {
   /**
    * Supprime une tâche avec gestion d'erreur
    */
-  async deleteTask(id: number): Promise<OperationResult<void>> {
+  async deleteTask(id: number | string): Promise<OperationResult<void>> {
     try {
       await apiService.deleteTask(id);
       toast.success('Tâche supprimée avec succès');
